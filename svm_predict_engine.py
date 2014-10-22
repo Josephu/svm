@@ -6,6 +6,8 @@ import random # shuffle
 import numpy as np
 from sklearn import svm
 from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import average_precision_score
+import matplotlib.pyplot as plt
 # from sklearn import cross_validation
 from pprint import pprint # print beautifully
 
@@ -108,11 +110,23 @@ def main():
   precision = dict()
   recall = dict()
   precision, recall, _ = precision_recall_curve(ys[TRAIN_SIZE:], ys_predicted)
+  average_precision = average_precision_score(ys[TRAIN_SIZE:], ys_predicted)
   logging.info("precision:")
   logging.info(precision)
   logging.info("recall:")
   logging.info(recall)
   #pdb.set_trace()
+
+  # Plot Precision-Recall curve
+  plt.clf()
+  plt.plot(recall, precision, label='Precision-Recall curve')
+  plt.xlabel('Recall')
+  plt.ylabel('Precision')
+  plt.ylim([0.0, 1.05])
+  plt.xlim([0.0, 1.0])
+  plt.title('Precision-Recall example: AUC={0:0.2f}'.format(average_precision))
+  plt.legend(loc="lower left")
+  plt.show()
 
 #   prob  = svm_problem(ys[:TRAIN_SIZE], xs[:TRAIN_SIZE])
 
