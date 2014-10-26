@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 from pprint import pprint # print beautifully
 
 RESULT_ROW_ID = 9
-TRAIN_SIZE = 80
+TRAIN_SIZE = 50
 C_VALUE = 1
 
 def format_y(y):
@@ -39,44 +39,7 @@ def to_array(line):
   """ convert input string to array """
   return line.split("\n")[0].split(',') 
 
-def main():
-  if len(sys.argv) < 2:
-    print('Please choose input file, eg. python prepare_data.py input.csv')
-    exit(0)
-
-  shuffled_input = []
-
-  ys = []
-  xs = []
-
-  input_file = sys.argv[1]
-  input_ptr = open(input_file)
-  c_value = str(C_VALUE)
-  model_file = input_file.split('.')[0] + '_c' + c_value + '.model'
-
-  logging.basicConfig(filename='predict.log',level=logging.DEBUG, format='')
-
-  # Load content from file and present as array
-  for line in input_ptr:
-    shuffled_input.append(to_array(line))
-
-  # Shuffle input data
-  random.shuffle(shuffled_input)
-
-  # build x, y arrays
-  for line in shuffled_input:
-    y, x = format_data(line)
-    ys.append(y)
-    xs.append(x)
-
-  # convert to numpy array
-  ys = np.asarray(ys)
-  xs = np.asarray(xs)
-
-  # dir(clf) # check all methods for clf
-
-  # train model
-  clf = svm.SVC(kernel='linear', C=1, probability=True)
+def run_svm(clf, xs, ys):
   clf.fit(xs[:TRAIN_SIZE], ys[:TRAIN_SIZE])
 
   logging.info("current time %s" % time.strftime("%c") )
@@ -117,32 +80,61 @@ def main():
   logging.info(recall)
   #pdb.set_trace()
 
+  return precision, recall
+
+def main():
+  if len(sys.argv) < 2:
+    print('Please choose input file, eg. python prepare_data.py input.csv')
+    exit(0)
+
+  shuffled_input = []
+
+  ys = []
+  xs = []
+
+  input_file = sys.argv[1]
+  input_ptr = open(input_file)
+  c_value = str(C_VALUE)
+  model_file = input_file.split('.')[0] + '_c' + c_value + '.model'
+
+  logging.basicConfig(filename='predict.log',level=logging.DEBUG, format='')
+
+  # Load content from file and present as array
+  for line in input_ptr:
+    shuffled_input.append(to_array(line))
+
+  # Shuffle input data
+  random.shuffle(shuffled_input)
+
+  # build x, y arrays
+  for line in shuffled_input:
+    y, x = format_data(line)
+    ys.append(y)
+    xs.append(x)
+
+  # convert to numpy array
+  ys = np.asarray(ys)
+  xs = np.asarray(xs)
+
+  # dir(clf) # check all methods for clf
+
+  # train model
+  clf = svm.SVC(kernel='linear', C=1, probability=True)
+  precision_no_weight, recall_no_weight = run_svm(clf, xs, ys)
+
+  clfw = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 10})
+  precision_w10, recall_w10 = run_svm(clfw, xs, ys)
+
   # Plot Precision-Recall curve
   plt.clf()
-  plt.plot(recall, precision, label='Precision-Recall curve')
+  plt.plot(recall_no_weight, precision_no_weight, label='none', c='g')
+  plt.plot(recall_w10, precision_w10, label='w(+1)10', c='b')
   plt.xlabel('Recall')
   plt.ylabel('Precision')
   plt.ylim([0.0, 1.05])
   plt.xlim([0.0, 1.0])
-  plt.title('Precision-Recall example: AUC={0:0.2f}'.format(average_precision))
+  plt.title('Precision-Recall example')
   plt.legend(loc="lower left")
   plt.show()
-
-#   prob  = svm_problem(ys[:TRAIN_SIZE], xs[:TRAIN_SIZE])
-
-#   param = svm_parameter('-t 0 -c ' + c_value) # linear and c as 1, 10 or 100
-#   m = svm_train(prob, param)
-#   svm_save_model(model_file, m)
-#   p_label, p_acc, p_val = svm_predict(ys[TRAIN_SIZE:], xs[TRAIN_SIZE:], m)
-
-#   logging.info("Current time %s" % time.strftime("%c") )
-#   logging.info('input_file = ' + input_file)
-#   logging.info('model_file = ' + model_file)
-#   logging.info('c = ' + c_value)
-#   logging.info('train size = ' + str(TRAIN_SIZE))
-#   logging.info('accuracy: ' + str(p_acc))
-#   logging.info('predicted results: ' + str(p_label))
-#   logging.info('----')
-#   #pdb.set_trace()
 
 if __name__ == '__main__': main()
