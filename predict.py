@@ -18,7 +18,7 @@ def threshold_array(start, end, dist):
     i += float(dist)
   return thresholds
 
-def run_svm(clf, xs, ys):
+def predict(clf, xs, ys):
   clf.fit(xs[:TRAIN_SIZE], ys[:TRAIN_SIZE])
 
   logging.info("current time %s" % time.strftime("%c") )
@@ -57,17 +57,7 @@ def run_svm(clf, xs, ys):
 
     logging.info("acc: {:.2f}, pre: {:.2f}, rec: {:.2f}".format(accuracy, precision, recall))
 
-  plt.clf()
-  plt.plot(thresholds, accuracies, label='accuracy', c='r')
-  plt.plot(thresholds, precisions, label='precision', c='g')
-  plt.plot(thresholds, recalls, label='recall', c='b')
-  plt.plot([default_threshold, default_threshold], [0, 1.05], linestyle=':')
-  plt.xlabel('Threshold')
-  plt.ylim([0.0, 1.05])
-  plt.xlim([start_threshold, end_threshold])
-  plt.title('Accuracy/Precision/Recall')
-  plt.legend(loc="lower left")
-  plt.show()
+  return accuracies, precisions, recalls, thresholds, default_threshold, start_threshold, end_threshold
 
 def main():
   if len(sys.argv) < 2:
@@ -84,10 +74,35 @@ def main():
   logging.basicConfig(filename='predict.log',level=logging.DEBUG, format='')
 
   # train model
-  #clf = svm.SVC(kernel='linear', C=1, probability=True)
-  #run_svm(clf, xs, ys)
+  clf = svm.SVC(kernel='linear', C=1, probability=True)
+  acc1, prec1, rec1, thres1, default_threshold1, start_threshold1, end_threshold1 = predict(clf, xs, ys)
 
-  clfw = svm.SVC(kernel='linear', C=1, probability=True, class_weight={-1: 10})
-  run_svm(clfw, xs, ys)
+  clfw = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 3})
+  acc2, prec2, rec2, thres2, default_threshold2, start_threshold2, end_threshold2 = predict(clfw, xs, ys)
+
+  plt.clf()
+  plt.subplot(2,2,1)
+  plt.title('No weight')
+  plt.plot(thres1, acc1, label='accuracy', c='r')
+  plt.plot(thres1, prec1, label='precision', c='g')
+  plt.plot(thres1, rec1, label='recall', c='b')
+  plt.plot([default_threshold1, default_threshold1], [0, 1.05], linestyle=':')
+  plt.xlabel('Threshold')
+  plt.ylim([0.0, 1.05])
+  plt.xlim([start_threshold1, end_threshold1])
+  plt.legend(loc="lower left")
+  plt.subplot(2,2,2)
+  plt.title('Weight 1:3')
+  plt.plot(thres2, acc2, label='accuracy', c='r')
+  plt.plot(thres2, prec2, label='precision', c='g')
+  plt.plot(thres2, rec2, label='recall', c='b')
+  plt.plot([default_threshold2, default_threshold2], [0, 1.05], linestyle=':')
+  plt.xlabel('Threshold')
+  plt.ylim([0.0, 1.05])
+  plt.xlim([start_threshold2, end_threshold2])
+  plt.legend(loc="lower left")
+
+  plt.show()
+
 
 if __name__ == '__main__': main()
