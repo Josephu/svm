@@ -4,12 +4,12 @@ import logging
 import time
 import random # shuffle
 import numpy as np
-from sklearn import svm
-from sklearn.metrics import precision_recall_curve
-from sklearn.metrics import average_precision_score
+from sklearn import svm, metrics
 import matplotlib.pyplot as plt
-# from sklearn import cross_validation
 from pprint import pprint # print beautifully
+# from sklearn import cross_validation
+# from sklearn.metrics import precision_recall_curve
+# from sklearn.metrics import average_precision_score
 
 RESULT_ROW_ID = 9
 TRAIN_SIZE = 50
@@ -39,6 +39,14 @@ def to_array(line):
   """ convert input string to array """
   return line.split("\n")[0].split(',') 
 
+def precision_recall_curve(ys, ys_predicted):
+  # precision and recall
+  precision = dict()
+  recall = dict()
+  precision, recall, threshold = precision_recall_curve(ys[TRAIN_SIZE:], ys_predicted)
+  average_precision = average_precision_score(ys[TRAIN_SIZE:], ys_predicted)
+  return precision, recall, threshold
+
 def run_svm(clf, xs, ys):
   clf.fit(xs[:TRAIN_SIZE], ys[:TRAIN_SIZE])
 
@@ -47,40 +55,48 @@ def run_svm(clf, xs, ys):
   logging.info(xs)
   logging.info("support vectors:")
   logging.info(clf.support_vectors_)
-  logging.info("indices of support vectors:")
-  logging.info(clf.support_)
-  logging.info("classes:")
-  logging.info(clf.classes_)
-  logging.info("number of support vectors for each class:")
-  logging.info(clf.n_support_)
+  # logging.info("indices of support vectors:")
+  # logging.info(clf.support_)
+  # logging.info("classes:")
+  # logging.info(clf.classes_)
+  logging.info("number of support vectors for each class: " + str(clf.n_support_))
+  logging.info("the importance of each vector")
+  logging.info(clf.dual_coef_)
+  logging.info("threshold: "+ str(clf._intercept_))
 
-  # predict results
-  ys_predicted_normal = clf.predict(xs[TRAIN_SIZE:])
-  ys_predicted = clf.decision_function(xs[TRAIN_SIZE:])
-  logging.info("predicted results:")
-  logging.info(ys_predicted_normal)
-  logging.info("actual results:")
-  logging.info(ys[TRAIN_SIZE:])
-  logging.info("predicted distances:")
-  logging.info(ys_predicted)
+  thresholds = [-1.0, -0.9, -0.8, -0.7, -0.6,-0.5, -0.4, -0.3, -0.2, -0.1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+  accuracies = []
+  precisions = []
+  recalls = []
 
-  # accuracy
-  logging.info("accuracy:")
-  accuracy = clf.score(xs[TRAIN_SIZE:], ys[TRAIN_SIZE:]) * 100
-  logging.info(str(accuracy) + "%")
+  for i in thresholds:
+    clf._intercept_ = np.asarray([i]) # Modify b
+    ys_predicted = clf.predict(xs[TRAIN_SIZE:]) # Predict
+    # ys_predicted = clf.decision_function(xs[TRAIN_SIZE:]) # distance not normalized yet
+    logging.info("predicted results:")
+    logging.info(ys_predicted)
+    logging.info("actual results:")
+    logging.info(ys[TRAIN_SIZE:])
 
-  # precision and recall
-  precision = dict()
-  recall = dict()
-  precision, recall, _ = precision_recall_curve(ys[TRAIN_SIZE:], ys_predicted)
-  average_precision = average_precision_score(ys[TRAIN_SIZE:], ys_predicted)
-  logging.info("precision:")
-  logging.info(precision)
-  logging.info("recall:")
-  logging.info(recall)
-  #pdb.set_trace()
+    accuracy = clf.score(xs[TRAIN_SIZE:], ys[TRAIN_SIZE:])
+    accuracies.append(accuracy)
+    precision = metrics.precision_score(ys[TRAIN_SIZE:], ys_predicted)
+    precisions.append(precision)
+    recall = metrics.recall_score(ys[TRAIN_SIZE:], ys_predicted)
+    recalls.append(recall)
 
-  return precision, recall
+    logging.info("acc: {:.2f}, pre: {:.2f}, rec: {:.2f}".format(accuracy, precision, recall))
+
+  plt.clf()
+  plt.plot(thresholds, accuracies, label='accuracy', c='r')
+  plt.plot(thresholds, precisions, label='precision', c='g')
+  plt.plot(thresholds, recalls, label='recall', c='b')
+  plt.xlabel('Threshold')
+  plt.ylim([0.0, 1.05])
+  plt.xlim([-1.0, 1.0])
+  plt.title('Accuracy/Precision/Recall')
+  plt.legend(loc="lower left")
+  plt.show()
 
 def main():
   if len(sys.argv) < 2:
@@ -120,21 +136,9 @@ def main():
 
   # train model
   clf = svm.SVC(kernel='linear', C=1, probability=True)
-  precision_no_weight, recall_no_weight = run_svm(clf, xs, ys)
+  run_svm(clf, xs, ys)
 
-  clfw = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 10})
-  precision_w10, recall_w10 = run_svm(clfw, xs, ys)
-
-  # Plot Precision-Recall curve
-  plt.clf()
-  plt.plot(recall_no_weight, precision_no_weight, label='none', c='g')
-  plt.plot(recall_w10, precision_w10, label='w(+1)10', c='b')
-  plt.xlabel('Recall')
-  plt.ylabel('Precision')
-  plt.ylim([0.0, 1.05])
-  plt.xlim([0.0, 1.0])
-  plt.title('Precision-Recall example')
-  plt.legend(loc="lower left")
-  plt.show()
+  # clfw = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 10})
+  # run_svm(clfw, xs, ys)
 
 if __name__ == '__main__': main()
