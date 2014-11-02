@@ -86,27 +86,27 @@ def main():
 
   # train model
   plt.subplot(2,2,1)
-  plt.title('No weight, C=1')
+  plt.title('C=1, gamma=0.0')
 
-  clf = svm.SVC(kernel='linear', C=1, probability=True)
+  clf = svm.SVC(kernel='rbf', C=1, gamma=0, probability=True)
   predict(clf, xs, ys)
 
   plt.subplot(2,2,2)
-  plt.title('Weight 1:3, C=1')
+  plt.title('C=1, gamma=0.01')
 
-  clf = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 3})
+  clf = svm.SVC(kernel='rbf', C=1, gamma=0.01, probability=True)
   predict(clf, xs, ys)
 
   plt.subplot(2,2,3)
-  plt.title('No weight, C=5')
+  plt.title('C=1, gamma=0.1')
 
-  clf = svm.SVC(kernel='linear', C=5, probability=True)
+  clf = svm.SVC(kernel='rbf', C=1, gamma=0.1, probability=True)
   predict(clf, xs, ys)
 
   plt.subplot(2,2,4)
-  plt.title('Weight 1:3, C=5')
+  plt.title('C=1, gamma=1.0')
 
-  clf = svm.SVC(kernel='linear', C=5, probability=True, class_weight={1: 3})
+  clf = svm.SVC(kernel='rbf', C=1, gamma=1.0, probability=True)
   predict(clf, xs, ys)
 
 
