@@ -55,12 +55,13 @@ def main():
   logging.basicConfig(filename='optimize.log',level=logging.DEBUG, format='')
 
   plt.clf()
-  plt.title('C - f1 plot')
+  plt.title('C-F1 plot')
   cs, f1_scores, accuracies = train_and_predict(xs, ys)
 
   plt.plot(cs, accuracies, label='acc', c='r')
   plt.plot(cs, f1_scores, label='f1', c='y')
   plt.xlabel('C')
+  plt.ylabel('F1')
   plt.ylim([0.0, 1.05])
   plt.xlim([cs[0], cs[-1]])
   plt.legend(loc="lower left")
