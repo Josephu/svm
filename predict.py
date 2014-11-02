@@ -22,8 +22,6 @@ def predict(clf, xs, ys):
   clf.fit(xs[:TRAIN_SIZE], ys[:TRAIN_SIZE])
 
   logging.info("current time %s" % time.strftime("%c") )
-  logging.info("shuffled inputs:")
-  logging.info(xs)
   logging.info("support vectors:")
   logging.info(clf.support_vectors_)
   # logging.info("indices of support vectors:")
@@ -42,6 +40,7 @@ def predict(clf, xs, ys):
   accuracies = []
   precisions = []
   recalls = []
+  f1_scores = []
 
   for i in thresholds:
     clf._intercept_ = np.asarray([i]) # Modify b
@@ -50,14 +49,24 @@ def predict(clf, xs, ys):
 
     accuracy = clf.score(xs[TRAIN_SIZE:], ys[TRAIN_SIZE:])
     accuracies.append(accuracy)
+    f1_score = metrics.f1_score(ys[TRAIN_SIZE:], ys_predicted, average='micro')
+    f1_scores.append(f1_score)
     precision = metrics.precision_score(ys[TRAIN_SIZE:], ys_predicted)
     precisions.append(precision)
     recall = metrics.recall_score(ys[TRAIN_SIZE:], ys_predicted)
     recalls.append(recall)
 
-    logging.info("acc: {:.2f}, pre: {:.2f}, rec: {:.2f}".format(accuracy, precision, recall))
+    #logging.info("acc: {:.2f}, pre: {:.2f}, rec: {:.2f}".format(accuracy, precision, recall))
 
-  return accuracies, precisions, recalls, thresholds, default_threshold, start_threshold, end_threshold
+  plt.plot(thresholds, accuracies, label='accuracy', c='r')
+  plt.plot(thresholds, f1_scores, label='f1 score', c='y')
+  plt.plot(thresholds, precisions, label='precision', c='g')
+  plt.plot(thresholds, recalls, label='recall', c='b')
+  plt.plot([default_threshold, default_threshold], [0, 1.05], linestyle=':')
+  #plt.xlabel('Threshold')
+  plt.ylim([0.0, 1.05])
+  plt.xlim([start_threshold, end_threshold])
+  plt.legend(loc="lower left")
 
 def main():
   if len(sys.argv) < 2:
@@ -73,34 +82,33 @@ def main():
 
   logging.basicConfig(filename='predict.log',level=logging.DEBUG, format='')
 
-  # train model
-  clf = svm.SVC(kernel='linear', C=1, probability=True)
-  acc1, prec1, rec1, thres1, default_threshold1, start_threshold1, end_threshold1 = predict(clf, xs, ys)
-
-  clfw = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 3})
-  acc2, prec2, rec2, thres2, default_threshold2, start_threshold2, end_threshold2 = predict(clfw, xs, ys)
-
   plt.clf()
+
+  # train model
   plt.subplot(2,2,1)
-  plt.title('No weight')
-  plt.plot(thres1, acc1, label='accuracy', c='r')
-  plt.plot(thres1, prec1, label='precision', c='g')
-  plt.plot(thres1, rec1, label='recall', c='b')
-  plt.plot([default_threshold1, default_threshold1], [0, 1.05], linestyle=':')
-  plt.xlabel('Threshold')
-  plt.ylim([0.0, 1.05])
-  plt.xlim([start_threshold1, end_threshold1])
-  plt.legend(loc="lower left")
+  plt.title('No weight, C=1')
+
+  clf = svm.SVC(kernel='linear', C=1, probability=True)
+  predict(clf, xs, ys)
+
   plt.subplot(2,2,2)
-  plt.title('Weight 1:3')
-  plt.plot(thres2, acc2, label='accuracy', c='r')
-  plt.plot(thres2, prec2, label='precision', c='g')
-  plt.plot(thres2, rec2, label='recall', c='b')
-  plt.plot([default_threshold2, default_threshold2], [0, 1.05], linestyle=':')
-  plt.xlabel('Threshold')
-  plt.ylim([0.0, 1.05])
-  plt.xlim([start_threshold2, end_threshold2])
-  plt.legend(loc="lower left")
+  plt.title('Weight 1:3, C=1')
+
+  clf = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 3})
+  predict(clf, xs, ys)
+
+  plt.subplot(2,2,3)
+  plt.title('No weight, C=5')
+
+  clf = svm.SVC(kernel='linear', C=5, probability=True)
+  predict(clf, xs, ys)
+
+  plt.subplot(2,2,4)
+  plt.title('Weight 1:3, C=5')
+
+  clf = svm.SVC(kernel='linear', C=5, probability=True, class_weight={1: 3})
+  predict(clf, xs, ys)
+
 
   plt.show()
 
