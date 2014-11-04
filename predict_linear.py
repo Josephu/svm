@@ -70,7 +70,7 @@ def predict(clf, xs, ys):
 
 def main():
   if len(sys.argv) < 2:
-    print('Please choose input file, eg. python prepare_data.py input.csv')
+    print('Please choose input file, eg. python predict_linear.py input.csv')
     exit(0)
 
   input_file = sys.argv[1]
