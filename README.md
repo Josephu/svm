@@ -90,11 +90,28 @@ This dataset is a 2 class dataset, to predict if can fertilize or not. It has mo
 
 This data is a 2 class dataset, to predict if the channel is retail or distributor. it has 440 samples and 6 features, and mostly are numeric, so it's suitable for SVM. I filtered the categorical variable.
 
+#### Using linear kernel
+
 	python process.py wholesale_customers.csv
-	python predict.py wholesale_customers_processed.csv
+	python predict_linear.py wholesale_customers_processed.csv
 
-![Using linear kernel](precision-recall-f1.png)
+#### Optimize by threshold
 
-![Optimizing with linear kernel](c_f1_plot.png "Optional title")
+<img src="precision-recall-f1.png" alt="Precision-Recall Plot" height="540" width="800" />
 
-![Optimizing rbf kernel ](c_gamma_plot.png "Optional title")
+#### Optimize by C
+
+<img src="c_f1_plot.png" height="480" width="640" />
+
+#### Using rbf kernel
+
+	python process.py wholesale_customers.csv
+	python predict_rbf.py wholesale_customers_processed.csv
+
+#### Optimize by threshold
+
+<img src="rbf.png" alt="Precision-Recall Plot" height="540" width="800" />
+
+#### Optimizing by C & gamma
+
+<img src="c_gamma_plot.png" alt="Precision-Recall Plot" height="480" width="640" />
