@@ -62,3 +62,39 @@ Link to homebrew science repos
 
 	# semantic web stuff: rdf & sparql
 	pip install rdflib SPARQLWrapper
+
+## Basics of SVM
+
+A good dataset for SVM analytics is when (number of samples)  >> (features), eg. 100 vs 10
+
+The feature of the datasets should be numberic, not categorical
+
+Eg. wholesale_customers.csv [url]() is 6 numberic features and 440 samples.
+
+### Process to train SVM classifier
+
+* Scale: There are many ways to scale. I use [MinMaxScaler]() which scale feature between 0 & 1
+* Choose parameters: Kernel - linear (C: higher the more accurate, may overfit), rbf (gamma: smaller more dedicate)
+* Train: Normally half dataset to train and half to validate is a good start, or for more advance - cross validation
+* Predict: Manually tune classifier, eg. b, as seen in c_
+
+## How to use
+
+### Fertility
+
+This dataset is a 2 class dataset, to predict if can fertilize or not. It has mostly false outcomes, so SVM does not work too well. Basically all predictions are false whatever parameters are used.
+
+	python svm_predict_engine.py fertility.csv
+
+### Wholesale customers
+
+This data is a 2 class dataset, to predict if the channel is retail or distributor. it has 440 samples and 6 features, and mostly are numeric, so it's suitable for SVM. I filtered the categorical variable.
+
+	python process.py wholesale_customers.csv
+	python predict.py wholesale_customers_processed.csv
+
+![Using linear kernel](precision-recall-f1.png)
+
+![Optimizing with linear kernel](c_f1_plot.png "Optional title")
+
+![Optimizing rbf kernel ](c_gamma_plot.png "Optional title")
