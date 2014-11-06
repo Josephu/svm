@@ -15,11 +15,19 @@ RESULT_ROW_ID = 9
 TRAIN_SIZE = 50
 C_VALUE = 1
 
+def threshold_array(start, end, dist):
+  thresholds = []
+  i = float(start)
+  while i <= float(end+dist):
+    thresholds.append(float(i))
+    i += float(dist)
+  return thresholds
+
 def format_y(y):
   """ libsvm only take 1, -1 as true, false for result format """
   return {
-    'N': -1,
-    'O': 1
+    'N': 1,
+    'O': -1
   }[y]
 
 def format_x(array):
@@ -32,7 +40,7 @@ def format_x(array):
 def format_data(row):
   """ format input array to proper format """
   result = format_y(row.pop(RESULT_ROW_ID))
-  elements = format_x(row)
+  elements = format_x(row[1:])
   return result, elements
 
 def to_array(line):
@@ -64,7 +72,8 @@ def run_svm(clf, xs, ys):
   logging.info(clf.dual_coef_)
   logging.info("threshold: "+ str(clf._intercept_))
 
-  thresholds = [-1.0, -0.9, -0.8, -0.7, -0.6,-0.5, -0.4, -0.3, -0.2, -0.1, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+  thresholds = threshold_array(-0.3, 0.3, 0.0001)
+
   accuracies = []
   precisions = []
   recalls = []
@@ -72,7 +81,9 @@ def run_svm(clf, xs, ys):
   for i in thresholds:
     clf._intercept_ = np.asarray([i]) # Modify b
     ys_predicted = clf.predict(xs[TRAIN_SIZE:]) # Predict
+
     # ys_predicted = clf.decision_function(xs[TRAIN_SIZE:]) # distance not normalized yet
+    logging.info("threshold" + str(i))
     logging.info("predicted results:")
     logging.info(ys_predicted)
     logging.info("actual results:")
@@ -93,7 +104,7 @@ def run_svm(clf, xs, ys):
   plt.plot(thresholds, recalls, label='recall', c='b')
   plt.xlabel('Threshold')
   plt.ylim([0.0, 1.05])
-  plt.xlim([-1.0, 1.0])
+  plt.xlim([-0.2, 0.2])
   plt.title('Accuracy/Precision/Recall')
   plt.legend(loc="lower left")
   plt.show()
@@ -135,7 +146,7 @@ def main():
   # dir(clf) # check all methods for clf
 
   # train model
-  clf = svm.SVC(kernel='linear', C=1, probability=True)
+  clf = svm.SVC(kernel='linear', C=1)
   run_svm(clf, xs, ys)
 
   # clfw = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 10})
