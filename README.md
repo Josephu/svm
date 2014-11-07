@@ -95,28 +95,36 @@ Below is plotted by C=1 using linear kernel.
 
 This data is a 2 class dataset, to predict if the channel is retail or distributor. it has 440 samples and 6 features, and mostly are numeric, so it's suitable for SVM. I filtered the categorical variable.
 
+#### Preprocess
+
+	cd wholesale_customers
+	python preprocess.py
+
 #### Using linear kernel
 
-	python process.py wholesale_customers.csv
+##### Optimize by threshold
+
 	python predict_linear.py wholesale_customers_processed.csv
 
-#### Optimize by threshold
+<img src="wholesale_customers/precision-recall-f1.png" alt="Precision-Recall Plot" height="540" width="800" />
 
-<img src="precision-recall-f1.png" alt="Precision-Recall Plot" height="540" width="800" />
+##### Optimize by C
 
-#### Optimize by C
+	python optimize_c.py wholesale_customers_processed.csv
 
-<img src="c_f1_plot.png" height="480" width="640" />
+<img src="wholesale_customers/c_f1_plot.png" height="480" width="640" />
 
 #### Using rbf kernel
 
-	python process.py wholesale_customers.csv
+
+##### Optimize by threshold
+
 	python predict_rbf.py wholesale_customers_processed.csv
 
-#### Optimize by threshold
+<img src="wholesale_customers/rbf.png" alt="Precision-Recall Plot" height="540" width="800" />
 
-<img src="rbf.png" alt="Precision-Recall Plot" height="540" width="800" />
+##### Optimizing by C & gamma
 
-#### Optimizing by C & gamma
+	python optimize_c_gamma.py wholesale_customers_processed.csv
 
-<img src="c_gamma_plot.png" alt="Precision-Recall Plot" height="480" width="640" />
+<img src="wholesale_customers/c_gamma_plot.png" alt="Precision-Recall Plot" height="480" width="640" />
