@@ -128,3 +128,41 @@ This data is a 2 class dataset, to predict if the channel is retail or distribut
 	python optimize_c_gamma.py wholesale_customers_processed.csv
 
 <img src="wholesale_customers/c_gamma_plot.png" alt="Precision-Recall Plot" height="480" width="640" />
+
+### Forest Fire
+
+This dataset describes the area of forests fire on certain days with the condition of the day. I am trying to predict if there will be fire today.
+
+#### Preprocess
+
+	cd forestfires
+	python preprocess.py
+
+#### Using linear kernel
+
+##### Optimize by threshold
+
+	python predict_linear.py wholesale_customers_processed.csv
+
+<img src="forestfires/predict_linear.png" alt="Precision-Recall Plot" height="540" width="800" />
+
+##### Optimize by C
+
+	python optimize_c.py wholesale_customers_processed.csv
+
+<img src="forestfires/optimize_c_f1_accuracy.png" alt="Optimize Plot" height="480" width="640" />
+
+#### Using rbf kernel
+
+
+##### Optimize by threshold
+
+	python predict_rbf.py wholesale_customers_processed.csv
+
+<img src="forestfires/predict_rbf.png" alt="Precision-Recall Plot" height="540" width="800" />
+
+##### Optimizing by C & gamma
+
+	python optimize_c_gamma.py wholesale_customers_processed.csv
+
+<img src="forestfires/optimize_c_gamma_accuracy.png" alt="Optimize Plot" height="480" width="640" />

@@ -7,9 +7,9 @@ from sklearn import svm, metrics
 import matplotlib.pyplot as plt
 from pprint import pprint # print beautifully
 
-TRAIN_SIZE = 200
-THRESHOLD_RANGE = 3
-THRESHOLD_SLOT = 0.1
+TRAIN_SIZE = 250
+THRESHOLD_RANGE = 2
+THRESHOLD_SLOT = 0.01
 
 def threshold_array(start, end, dist):
   thresholds = []
@@ -71,7 +71,7 @@ def predict(clf, xs, ys):
 
 def main():
   if len(sys.argv) < 2:
-    print('Please choose input file, eg. python prepare_data.py input.csv')
+    print('Please choose input file, eg. python predict_linear.py input.csv')
     exit(0)
 
   input_file = sys.argv[1]
@@ -86,27 +86,27 @@ def main():
 
   # train model
   plt.subplot(2,2,1)
-  plt.title('C=1, gamma=0.0')
+  plt.title('No weight, C=1')
 
-  clf = svm.SVC(kernel='rbf', C=1, gamma=0, probability=True)
+  clf = svm.SVC(kernel='linear', C=1, probability=True)
   predict(clf, xs, ys)
 
   plt.subplot(2,2,2)
-  plt.title('C=1, gamma=0.01')
+  plt.title('Weight 1:3, C=1')
 
-  clf = svm.SVC(kernel='rbf', C=1, gamma=0.01, probability=True)
+  clf = svm.SVC(kernel='linear', C=1, probability=True, class_weight={1: 3})
   predict(clf, xs, ys)
 
   plt.subplot(2,2,3)
-  plt.title('C=1, gamma=0.1')
+  plt.title('No weight, C=5')
 
-  clf = svm.SVC(kernel='rbf', C=1, gamma=0.1, probability=True)
+  clf = svm.SVC(kernel='linear', C=5, probability=True)
   predict(clf, xs, ys)
 
   plt.subplot(2,2,4)
-  plt.title('C=1, gamma=1.0')
+  plt.title('Weight 1:3, C=5')
 
-  clf = svm.SVC(kernel='rbf', C=1, gamma=1.0, probability=True)
+  clf = svm.SVC(kernel='linear', C=5, probability=True, class_weight={1: 3})
   predict(clf, xs, ys)
 
 
