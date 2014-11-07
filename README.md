@@ -84,6 +84,7 @@ Eg. wholesale_customers.csv [url]() is 6 numberic features and 440 samples.
 
 This dataset is a 2 class dataset, to predict if can fertilize or not. It has mostly true outcomes, so SVM does not work too well. Basically all predictions are true whatever parameters are used.
 
+	cd fertility
 	python svm_predict_engine.py fertility.csv
 
 Below is plotted by C=1 using linear kernel.
