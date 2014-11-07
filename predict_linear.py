@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 from pprint import pprint # print beautifully
 
 TRAIN_SIZE = 200
-C_VALUE = 1
+THRESHOLD_RANGE = 3
+THRESHOLD_SLOT = 0.1
 
 def threshold_array(start, end, dist):
   thresholds = []
@@ -34,9 +35,9 @@ def predict(clf, xs, ys):
   logging.info("threshold: "+ str(clf._intercept_))
 
   default_threshold = clf._intercept_
-  start_threshold = float(default_threshold - 3)
-  end_threshold = float(default_threshold + 3)
-  thresholds = threshold_array(start_threshold, end_threshold, 0.1)
+  start_threshold = float(default_threshold - THRESHOLD_RANGE)
+  end_threshold = float(default_threshold + THRESHOLD_RANGE)
+  thresholds = threshold_array(start_threshold, end_threshold, THRESHOLD_SLOT)
   accuracies = []
   precisions = []
   recalls = []
@@ -74,7 +75,6 @@ def main():
     exit(0)
 
   input_file = sys.argv[1]
-  c_value = str(C_VALUE)
   dataset = np.genfromtxt(input_file, delimiter=',', skip_header=1)
 
   ys = dataset[:][:,0]

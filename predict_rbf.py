@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 from pprint import pprint # print beautifully
 
 TRAIN_SIZE = 200
-C_VALUE = 1
 
 def threshold_array(start, end, dist):
   thresholds = []
@@ -74,7 +73,6 @@ def main():
     exit(0)
 
   input_file = sys.argv[1]
-  c_value = str(C_VALUE)
   dataset = np.genfromtxt(input_file, delimiter=',', skip_header=1)
 
   ys = dataset[:][:,0]
